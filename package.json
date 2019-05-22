@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha tests/test_cases --reporter spec",
+    "test": "TEST_MODE=handler mocha tests/test_cases --reporter spec",
     "acceptance": "TEST_MODE=http ./node_modules/.bin/mocha tests/test_cases --reporter spec",
     "sls": "serverless"
   },
