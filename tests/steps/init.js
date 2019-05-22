@@ -19,8 +19,14 @@ const init = async () => {
   
   process.env.AWS_ACCESS_KEY_ID     = credentials.accessKeyId
   process.env.AWS_SECRET_ACCESS_KEY = credentials.secretAccessKey
-  process.env.TEST_ROOT = "https://vf9e6n64u3.execute-api.us-east-1.amazonaws.com/dev"
+
+  if (credentials.sessionToken) {
+    process.env.AWS_SESSION_TOKEN = credentials.sessionToken;
+  }
+
   console.log('AWS credential loaded')
+
+  process.env.TEST_ROOT = "https://vf9e6n64u3.execute-api.us-east-1.amazonaws.com/dev"
 
   initialized = true
 }
