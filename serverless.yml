@@ -29,6 +29,12 @@ provider:
       Action: sns:Publish
       Resource: 
         Ref: restaurantNotificationTopic
+    - Effect: Allow
+      Action: sns:Publish
+      Resource: 
+        - Ref: restaurantNotificationTopic
+        - Ref: restaurantNotificationRetryTopic
+        - Ref: restaurantNotificationDLQTopic
 
 functions:
   get-index:
@@ -87,6 +93,8 @@ functions:
       order_events_stream: ${ssm:/workshop-hao/dev/stream_name}
       restaurant_notification_topic: 
         Ref: restaurantNotificationTopic
+      restaurant_notification_retry_topic: 
+        Ref: restaurantNotificationRetryTopic
 
   place-order:
     handler: functions/place-order.handler
@@ -98,6 +106,20 @@ functions:
             arn: arn:aws:cognito-idp:#{AWS::Region}:#{AWS::AccountId}:userpool/${ssm:/workshop-hao/dev/cognito_user_pool_id}
     environment:
       order_events_stream: ${ssm:/workshop-hao/dev/stream_name}
+
+  retry-notify-restaurant:
+    handler: functions/retry-notify-restaurant.handler
+    events:
+      - sns: 
+          arn: 
+            Ref: restaurantNotificationRetryTopic
+          topicName: ${ssm:/workshop-hao/dev/restaurant_retry_topic_name}
+    environment:
+      order_events_stream: ${ssm:/workshop-hao/dev/stream_name}
+      restaurant_notification_topic: 
+        Ref: restaurantNotificationTopic
+    onError: 
+      Ref: restaurantNotificationDLQTopic
 
 resources:
   Resources:
@@ -125,3 +147,15 @@ resources:
       Properties: 
         DisplayName: ${ssm:/workshop-hao/dev/restaurant_topic_name}
         TopicName: ${ssm:/workshop-hao/dev/restaurant_topic_name}
+    
+    restaurantNotificationRetryTopic:
+      Type: AWS::SNS::Topic
+      Properties: 
+        DisplayName: ${ssm:/workshop-hao/dev/restaurant_retry_topic_name}
+        TopicName: ${ssm:/workshop-hao/dev/restaurant_retry_topic_name}
+
+    restaurantNotificationDLQTopic:
+      Type: AWS::SNS::Topic
+      Properties: 
+        DisplayName: ${ssm:/workshop-hao/dev/restaurant_dlq_topic_name}
+        TopicName: ${ssm:/workshop-hao/dev/restaurant_dlq_topic_name}
