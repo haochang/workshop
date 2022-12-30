@@ -13,7 +13,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "cheerio": "^1.0.0-rc.3",
-    "mocha": "^6.1.4",
+    "mocha": "^10.2.0",
     "mock-aws": "^1.2.3",
     "serverless": "^1.43.0",
     "serverless-offline": "^4.10.5",
